@@ -37,4 +37,6 @@ provider "aws" {
   allowed_account_ids = [var.allowed_account_id]
 }
 
-provider "github" {}
+provider "github" {
+  owner = "colintessarzick"
+}
