@@ -1,6 +1,6 @@
 //
 // routes.swift
-// api-server
+// swift-api-service
 //
 // Created by Colin Tessarzick on Wed Feb 08 2023.
 //
@@ -28,11 +28,14 @@ import Vapor
 
 
 func routes(_ app: Application) throws {
-    app.get { req async in
-        "It works!"
+    app.get { req in
+        return "Hello, world!"
     }
 
-    app.get("hello") { req async -> String in
-        "Hello, world!"
+    app.get(":name") { req throws -> String in
+        guard let name: String = req.parameters.get("name") else {
+            throw Abort(.badRequest)
+        }
+        return "Hello \(name)!"
     }
 }

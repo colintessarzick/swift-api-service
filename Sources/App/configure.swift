@@ -1,6 +1,6 @@
 //
 // configure.swift
-// api-server
+// swift-api-service
 //
 // Created by Colin Tessarzick on Wed Feb 08 2023.
 //
