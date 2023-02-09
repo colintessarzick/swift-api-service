@@ -56,7 +56,9 @@ jobs:
       - name: Deploy to App Runner
         id: deploy
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: aws apprunner start-deployment --service-arn ${{ secrets.APP_RUNNER_ARN }} --region eu-west-1
+        env:
+          APP_RUNNER_ARN: ${{ secrets.APP_RUNNER_ARN }}
+        run: aws apprunner start-deployment --service-arn ${{ env.APP_RUNNER_ARN }} --region eu-west-1
 
   terraform:
     name: Terraform
