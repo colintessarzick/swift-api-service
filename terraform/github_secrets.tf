@@ -1,5 +1,5 @@
 data "github_repository" "this" {
-  name = "colintessarzick/${var.deployment_name}"
+  name = var.deployment_name
 }
 
 resource "github_actions_secret" "app_runner_id" {
