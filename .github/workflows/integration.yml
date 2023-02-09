@@ -82,6 +82,13 @@ jobs:
         run: |
           rm -rf /tmp/.buildx-cache
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+      
+      - name: Deploy to App Runner
+        id: deploy
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        env:
+          APP_RUNNER_ID: ${{ secrets.APP_RUNNER_ID }}
+        run: aws apprunner start-deployment --service-arn arn:aws:apprunner:eu-west-1:$(TF_VAR_allowed_account_id):service/$(TF_VAR_deployment_name)/$(APP_RUNNER_ID) --region eu-west-1
 
   terraform:
     name: Terraform
@@ -201,10 +208,3 @@ jobs:
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: make auto-apply
-      
-      - name: Deploy to App Runner
-        id: deploy
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        env:
-          APP_RUNNER_ID: ${{ secrets.APP_RUNNER_ID }}
-        run: aws apprunner start-deployment --service-arn arn:aws:apprunner:eu-west-1:$(TF_VAR_allowed_account_id):service/$(TF_VAR_deployment_name)/$(APP_RUNNER_ID) --region eu-west-1
