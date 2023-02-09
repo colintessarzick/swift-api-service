@@ -55,13 +55,8 @@ jobs:
       
       - name: Deploy to App Runner
         id: deploy
-        uses: awslabs/amazon-app-runner-deploy@main
-        with:
-          service: swift-api-service-test
-          image: ${{ steps.build-image.outputs.image }}
-          access-role-arn: ${{ secrets.APP_RUNNER_ROLE_ARN }}
-          region: eu-west-1
-          port: 5813
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: aws apprunner start-deployment --service-arn ${{ secrets.APP_RUNNER_ARN }} --region eu-west-1
 
   terraform:
     name: Terraform
