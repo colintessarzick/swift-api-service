@@ -61,60 +61,7 @@ jobs:
           image: ${{ steps.build-image.outputs.image }}
           access-role-arn: ${{ secrets.APP_RUNNER_ROLE_ARN }}
           region: eu-west-1
-      
-      # - name: Prepare
-      #   id: prep
-      #   env:
-      #     IMAGE_REPO: swift-api-service-test-container-repository
-      #   run: |
-      #     TAG=$(echo $GITHUB_SHA | head -c7)
-      #     IMAGE="${{ env.ECR_REGISTRY }}/${{ env.IMAGE_REPO }}"
-      #     echo ::set-output name=tagged_image::${IMAGE}:latest
-      #     echo ::set-output name=tag::latest
-
-      # - name: Login to Amazon ECR
-      #   id: login-ecr
-      #   uses: docker/login-action@v2
-      #   with:
-      #     registry: ${{ env.ECR_REGISTRY }}
-
-      # - name: Set up Docker Buildx
-      #   id: buildx
-      #   uses: docker/setup-buildx-action@master
-
-      # - name: Cache Docker layers
-      #   uses: actions/cache@v2
-      #   with:
-      #     path: /tmp/.buildx-cache
-      #     key: ${{ runner.os }}-single-buildx-${{ github.sha }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-single-buildx
-
-      # - name: Build image
-      #   timeout-minutes: 10
-      #   uses: docker/build-push-action@v2
-      #   with:
-      #     context: .
-      #     builder: ${{ steps.buildx.outputs.name }}
-      #     file: ./docker/local.Dockerfile
-      #     push: true
-      #     tags: ${{ steps.prep.outputs.tagged_image }}
-      #     cache-from: type=local,src=/tmp/.buildx-cache
-      #     cache-to: type=local,dest=/tmp/.buildx-cache-new
-
-      # - name: Move cache
-      #   run: |
-      #     rm -rf /tmp/.buildx-cache
-      #     mv /tmp/.buildx-cache-new /tmp/.buildx-cache
-      
-      # - name: Deploy to App Runner
-      #   id: deploy
-      #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      #   env:
-      #     APP_RUNNER_ID: ${{ secrets.APP_RUNNER_ID }}
-      #     ALLOWED_ACCOUNT_ID: ${{ secrets.ALLOWED_ACCOUNT_ID }}
-      #     SERVICE: swift-api-service-test
-      #   run: aws apprunner start-deployment --service-arn arn:aws:apprunner:eu-west-1:${{ env.ALLOWED_ACCOUNT_ID }}:service/${{ env.SERVICE }}/${{ env.APP_RUNNER_ID }} --region eu-west-1
+          port: 5813
 
   terraform:
     name: Terraform
