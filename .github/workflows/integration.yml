@@ -11,9 +11,20 @@ jobs:
     name: Build Application
     runs-on: ubuntu-latest
 
+    env:
+      AWS_DEFAULT_REGION: eu-central-1
+      ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-west-1.amazonaws.com
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: 'eu-central-1'
 
       - name: Set up Swift 5.7
         uses: fwal/setup-swift@v1
@@ -26,6 +37,22 @@ jobs:
       - name: Run tests
         id: tests
         run: make unittest
+      
+      - name: Prepare
+        id: prep
+        env:
+          IMAGE_REPO: swift-api-service-test-container-repository
+        run: |
+          TAG=$(echo $GITHUB_SHA | head -c7)
+          IMAGE="${{ env.ECR_REGISTRY }}/${{ env.IMAGE_REPO }}"
+          echo ::set-output name=tagged_image::${IMAGE}:latest
+          echo ::set-output name=tag::latest
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.ECR_REGISTRY }}
 
       - name: Set up Docker Buildx
         id: buildx
@@ -46,6 +73,8 @@ jobs:
           context: .
           builder: ${{ steps.buildx.outputs.name }}
           file: ./docker/local.Dockerfile
+          push: true
+          tags: ${{ steps.prep.outputs.tagged_image }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new
 
