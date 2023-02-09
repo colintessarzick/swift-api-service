@@ -89,7 +89,7 @@ jobs:
         env:
           APP_RUNNER_ID: ${{ secrets.APP_RUNNER_ID }}
           ALLOWED_ACCOUNT_ID: ${{ secrets.ALLOWED_ACCOUNT_ID }}
-          SERVICE: swift-api-service
+          SERVICE: swift-api-service-test
         run: aws apprunner start-deployment --service-arn arn:aws:apprunner:eu-west-1:${{ env.ALLOWED_ACCOUNT_ID }}:service/${{ env.SERVICE }}/${{ env.APP_RUNNER_ID }} --region eu-west-1
 
   terraform:
