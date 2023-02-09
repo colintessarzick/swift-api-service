@@ -4,6 +4,10 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 4.53.0"
     }
+    github = {
+      source  = "integrations/github"
+      version = "~> 5.17.0"
+    }
   }
 
   backend "s3" {}
@@ -32,3 +36,5 @@ provider "aws" {
   }
   allowed_account_ids = [var.allowed_account_id]
 }
+
+provider "github" {}
