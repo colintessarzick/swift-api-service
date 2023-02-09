@@ -1,0 +1,173 @@
+name: Integration
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    name: Build Application
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Swift 5.7.3
+        uses: fwal/setup-swift@v1
+        with:
+          swift-version: 5.7.3
+
+      - name: Build
+        run: make build
+
+      - name: Run tests
+        id: tests
+        run: make unittest
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@master
+
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-single-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-single-buildx
+
+      - name: Build image
+        timeout-minutes: 10
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          builder: ${{ steps.buildx.outputs.name }}
+          file: ./docker/local.Dockerfile
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new
+
+      - name: Move cache
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+
+  terraform:
+    name: Terraform
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform
+
+    env:
+      TF_VAR_environment: test
+      TF_VAR_deployment_name: swift-api-service
+      TF_VAR_allowed_account_id: ${{ secrets.ALLOWED_ACCOUNT_ID }}
+
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: 'eu-central-1'
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ~> 1.3.0
+
+      - name: Terraform Check Format
+        id: fmt
+        run: make fmt-check
+
+      - name: Terraform Init
+        id: init
+        run: make init
+
+      - name: Terraform Validate
+        id: validate
+        run: make validate
+
+      - name: Terraform Plan
+        timeout-minutes: 5
+        id: plan
+        if: github.event_name == 'pull_request'
+        run: make plan
+        continue-on-error: true
+
+      - name: Update Pull Request
+        uses: actions/github-script@v6
+        if: github.event_name == 'pull_request'
+        env:
+          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
+        with:
+          script: |
+            // 1. Retrieve existing bot comments for the PR
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            })
+            const botComment = comments.find(comment => {
+              return comment.user.type === 'Bot' && comment.body.includes('Terraform Format and Style')
+            })
+
+            // 2. Prepare format of the comment
+            const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
+            #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
+            #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
+            <details><summary>Validation Output</summary>
+
+            \`\`\`\n
+            ${{ steps.validate.outputs.stdout }}
+            \`\`\`
+
+            </details>
+
+            #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
+
+            <details><summary>Show Plan</summary>
+
+            \`\`\`\n
+            ${process.env.PLAN}
+            \`\`\`
+
+            </details>
+
+            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`*`;
+
+            // 3. If we have a comment, update it, otherwise create a new one
+            if (botComment) {
+              github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: output
+              })
+            } else {
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: output
+              })
+            }
+
+      - name: Terraform Plan Status
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: make auto-apply
