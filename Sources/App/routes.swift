@@ -1,8 +1,7 @@
 //
 // routes.swift
-// swift-api-service
 //
-// Created by Colin Tessarzick on Wed Feb 08 2023.
+// Created by Colin Tessarzick on Fri Feb 10 2023.
 //
 // Copyright © 2023-2023 CoSee GmbH. All rights reserved.
 //
@@ -23,6 +22,7 @@
 //  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
+//
 
 import Vapor
 
