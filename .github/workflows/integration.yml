@@ -44,7 +44,7 @@ jobs:
             swift-
 
       - name: Build Application
-        if: github.event_name == 'pull_request' && steps.cached-build.outputs.cache-hit != 'true'
+        if: steps.cached-build.outputs.cache-hit != 'true'
         id: build
         run: make build
 
