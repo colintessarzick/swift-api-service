@@ -1,4 +1,4 @@
-name: Integration
+name: CI/CD
 
 on:
   push:
@@ -31,7 +31,9 @@ jobs:
         with:
           swift-version: 5.7
 
-      - name: Build
+      - name: Build Application
+        if: github.event_name == 'pull_request'
+        id: build
         run: make build
 
       - name: Run tests
@@ -39,10 +41,12 @@ jobs:
         run: make unittest
       
       - name: Login to Amazon ECR
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
       
       - name: Build, tag, and push image to Amazon ECR
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         id: build-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -54,8 +58,8 @@ jobs:
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
       
       - name: Deploy to App Runner
-        id: deploy
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        id: deploy
         env:
           APP_RUNNER_ARN: ${{ secrets.APP_RUNNER_ARN }}
         run: aws apprunner start-deployment --service-arn ${{ env.APP_RUNNER_ARN }} --region eu-west-1
