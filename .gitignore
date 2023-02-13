@@ -8,6 +8,10 @@ db.sqlite
 .swiftpm
 .env
 
+# IDEs
+.vscode
+.idea
+
 # Local .terraform directories
 **/.terraform/*
 
