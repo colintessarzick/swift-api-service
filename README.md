@@ -44,28 +44,28 @@ class APIRequest<ResponseType: SASAPIResponseDecodable: NSObject {
 The file name is defined according to it's content. If the primary content of the file is a custom class, the filename must match the name of the class. If the primary content is an extension of a third-party library, the filename is `third-party class name + SwiftAPIService` (written without any whitespaces).
 
 Default file name example:
-```shell
+```swift
 ClassName.swift
 ```
-```shell
+```swift
 SASAPIClient.swift
 ```
 
 Extension file name example:
-```shell
+```swift
 ThirdPartyClassName+SwiftAPIService.filetype
 ```
-```shell
+```swift
 URLEncoder+SwiftAPIService.swift
 ```
 
 There is one exception to the file naming conventions specified above. In case the file is meant as an extension and contains only one function or specific purpose, the file will be named according to that specific purpose instead of `+SwiftAPIService`.
 
 Single purpose Extension example:
-```shell
+```swift
 ThirdPartClassName+Purpose.filetype
 ```
-```shell
+```swift
 URLSession+Retry.swift
 ```
 
