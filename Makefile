@@ -1,13 +1,13 @@
 compose-up:
-	docker compose up -d
+	docker compose up -d --remove-orphans
 
-compose-down: prune
-	docker compose down
+compose-down:
+	docker compose down --remove-orphans
 
 compose-new:
-	docker compose up -d --build
+	docker compose up -d --build --remove-orphans
 
-prune:
+prune: compose-down
 	docker container prune -f
 	docker image prune -f
 
