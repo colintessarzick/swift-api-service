@@ -1,0 +1,31 @@
+name: Schedule App Runner Uptime
+
+on:
+  schedule:
+    - cron: '0 8 * * 1-5'
+    - cron: '0 16 * * 1-5'
+
+jobs:
+  schedule-uptime:
+    runs-on: ubuntu-latest
+
+    env:
+      APP_RUNNER_ARN: ${{ secrets.APP_RUNNER_ARN }}
+
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: 'eu-west-1'
+
+      - name: Resume Service Availability
+        if: github.event.schedule == '0 8 * * 1-5'
+        id: resume
+        run: aws apprunner resume-service --service-arn ${{ env.APP_RUNNER_ARN }} --region eu-west-1
+
+      - name: Pause Service Availability
+        if: github.event.schedule == '0 16 * * 1-5'
+        id: pause
+        run: aws apprunner pause-service --service-arn ${{ env.APP_RUNNER_ARN }} --region eu-west-1
