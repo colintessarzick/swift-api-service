@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN apt-get update && apt-get install -y libssl-dev
+RUN apt-get update && apt-get install -y
 
 RUN swift package clean
 RUN swift build
