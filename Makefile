@@ -18,4 +18,4 @@ run:
 	swift run Run serve
 
 unittest:
-	swift test
+	swift test --skip-build
