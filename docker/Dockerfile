@@ -7,7 +7,7 @@ COPY . .
 RUN apt-get update && apt-get install -y
 
 RUN swift package clean
-RUN swift build
+RUN swift build -c release
 
 RUN mkdir /app/bin
 RUN mv `swift build --show-bin-path` /app/bin
