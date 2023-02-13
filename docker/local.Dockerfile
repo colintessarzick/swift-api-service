@@ -12,5 +12,5 @@ RUN swift build
 RUN mkdir /app/bin
 RUN mv `swift build --show-bin-path` /app/bin
 
-EXPOSE 5813
-ENTRYPOINT ./bin/debug/Run serve --env local --hostname 0.0.0.0 --port 5813
+EXPOSE 8080
+ENTRYPOINT ./bin/debug/Run serve --env local --hostname 0.0.0.0 --port 8080
