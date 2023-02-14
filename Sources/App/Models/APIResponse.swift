@@ -26,5 +26,5 @@
 
 
 struct APIResponse {
-    let label: String?
+    let label: String
 }
