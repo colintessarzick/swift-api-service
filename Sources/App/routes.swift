@@ -29,13 +29,15 @@ import Vapor
 
 func routes(_ app: Application) throws {
     app.get { req in
-        return "Hello, world!"
+        let response: APIResponse = APIResponse(label: "Hello, world!")
+        return response.label
     }
 
     app.get(":name") { req throws -> String in
         guard let name: String = req.parameters.get("name") else {
             throw Abort(.badRequest)
         }
-        return "Hello \(name)!"
+        let response: APIResponse = APIResponse(label: "Hello, \(name)!")
+        return response.label
     }
 }
