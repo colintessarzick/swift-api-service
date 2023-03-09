@@ -28,7 +28,7 @@ import Vapor
 
 
 func routes(_ app: Application) throws {
-    app.get { req in
+    app.get { req throws -> String in
         let response: APIResponse = APIResponse(label: "Hello, world!")
         return response.label
     }
