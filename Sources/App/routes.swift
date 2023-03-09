@@ -40,4 +40,9 @@ func routes(_ app: Application) throws {
         let response: APIResponse = APIResponse(label: "Hello, \(name)!")
         return response.label
     }
+
+    app.get("aws") { req throws -> String in
+        let response: APIResponse = APIResponse(label: "What a great evening!")
+        return response.label
+    }
 }
