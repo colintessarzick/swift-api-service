@@ -20,6 +20,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      
+      - name: Set environment specific variables
+        run: |
+          if [[ ${{github.event_name}} == 'workflow_dispatch' ]]; then
+            echo "ECR_REPOSITORY=swift-api-service-live-container-repository" >> "$GITHUB_ENV"
+            echo "APP_RUNNER_ARN=${{ secrets.LIVE_APP_RUNNER_ARN }}" >> "$GITHUB_ENV"
+          else
+            echo "ECR_REPOSITORY=swift-api-service-test-container-repository" >> "$GITHUB_ENV"
+            echo "APP_RUNNER_ARN=${{ secrets.TEST_APP_RUNNER_ARN }}" >> "$GITHUB_ENV"
+          fi
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -63,7 +73,6 @@ jobs:
         id: build-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: swift-api-service-test-container-repository
           IMAGE_TAG: ${{ github.sha }}
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG . -f ./docker/Dockerfile
@@ -75,7 +84,6 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         id: deploy
         env:
-          APP_RUNNER_ARN: ${{ secrets.APP_RUNNER_ARN }}
         run: aws apprunner start-deployment --service-arn ${{ env.APP_RUNNER_ARN }} --region eu-west-1
 
   terraform:
@@ -86,7 +94,6 @@ jobs:
         working-directory: terraform
 
     env:
-      TF_VAR_environment: test
       TF_VAR_deployment_name: swift-api-service
       TF_VAR_allowed_account_id: ${{ secrets.ALLOWED_ACCOUNT_ID }}
       GITHUB_TOKEN: ${{ secrets.PAT }}
@@ -99,6 +106,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      
+      - name: Set environment specific variables
+        run: |
+          if [[ ${{github.event_name}} == 'workflow_dispatch' ]]; then
+            echo "TF_VAR_environment=live" >> "$GITHUB_ENV"
+          else
+            echo "TF_VAR_environment=test" >> "$GITHUB_ENV"
+          fi
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -194,5 +209,5 @@ jobs:
         run: exit 1
 
       - name: Terraform Apply
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
         run: make auto-apply
