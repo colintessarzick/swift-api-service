@@ -166,7 +166,7 @@ jobs:
           aws-region: 'eu-west-1'
 
       - name: Set up Swift ${{ env.SWIFT_VERSION }}
-        uses: fwal/setup-swift@v1
+        uses: swift-actions/setup-swift@v1
         with:
           swift-version: ${{ env.SWIFT_VERSION }}
       
