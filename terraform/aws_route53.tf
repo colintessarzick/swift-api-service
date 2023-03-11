@@ -23,11 +23,17 @@ resource "aws_route53_record" "public_domain" {
 resource "aws_route53_record" "api_service_domain_mapping" {
   depends_on = [aws_apprunner_custom_domain_association.api_service]
 
-  for_each = aws_apprunner_custom_domain_association.api_service.certificate_validation_records
+  for_each = {
+    for dvo in aws_apprunner_custom_domain_association.api_service.certificate_validation_records : dvo.name => {
+        name = dvo.name
+        type = dvo.type
+        record = dvo.value
+    }
+  }
 
   allow_overwrite = true
   name            = each.value.name
-  records         = [each.value.value]
+  records         = [each.value.record]
   type            = each.value.type
   ttl             = 60
   zone_id         = data.aws_route53_zone.domain.zone_id
