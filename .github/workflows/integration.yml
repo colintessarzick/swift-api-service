@@ -33,8 +33,10 @@ jobs:
         run: |
           if [[ ${{github.event_name}} == 'workflow_dispatch' ]]; then
             echo "TF_VAR_environment=live" >> "$GITHUB_ENV"
+            echo "BACKEND_CONFIG=remote_state_live.tfvars" >> "$GITHUB_ENV"
           else
             echo "TF_VAR_environment=test" >> "$GITHUB_ENV"
+            echo "BACKEND_CONFIG=remote_state_test.tfvars" >> "$GITHUB_ENV"
           fi
 
       - name: Configure AWS credentials

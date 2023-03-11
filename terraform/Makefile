@@ -1,4 +1,4 @@
-BACKEND_CONFIG := remote_state.tfvars
+BACKEND_CONFIG ?=
 
 init:
 	terraform init -backend-config=$(BACKEND_CONFIG) -reconfigure
