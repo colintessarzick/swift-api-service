@@ -142,7 +142,8 @@ jobs:
     env:
       AWS_DEFAULT_REGION: eu-central-1
       ECR_REGISTRY: ${{ secrets.ALLOWED_ACCOUNT_ID }}.dkr.ecr.eu-west-1.amazonaws.com
-      SWIFT_VERSION: 5.7.2
+      PYTHON_VERSION: 3.11.2
+      POETRY_VERSION: 1.2.2
 
     steps:
       - name: Checkout
@@ -165,30 +166,41 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: 'eu-west-1'
 
-      - name: Set up Swift ${{ env.SWIFT_VERSION }}
-        uses: swift-actions/setup-swift@v1
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v4
         with:
-          swift-version: ${{ env.SWIFT_VERSION }}
-      
-      - name: Load Swift Build cache
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Load Poetry ${{ env.POETRY_VERSION }} cache
         uses: actions/cache@v3
-        id: cached-build
         with:
-          path: .build
-          key: swift-${{ runner.os }}-${{ env.SWIFT_VERSION }}-${{ hashFiles('**/Package.resolved') }}
+          path: ~/.local
+          key: poetry-${{ env.POETRY_VERSION }}
+
+      - name: Install Poetry ${{ env.POETRY_VERSION }}
+        uses: snok/install-poetry@v1
+        with:
+          version: ${{ env.POETRY_VERSION }}
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      - name: Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v3
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
           restore-keys: |
-            swift-${{ runner.os }}-${{ env.SWIFT_VERSION }}-
-            swift-${{ runner.os }}-
-            swift-
+            venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-
+            venv-${{ runner.os }}-
+            venv-
 
-      - name: Build Application
-        if: steps.cached-build.outputs.cache-hit != 'true'
-        id: build
-        run: make build
+      - name: Install dependencies
+        id: install
+        run: poetry install
 
-      - name: Run tests
-        id: tests
-        run: make unittest
+      - name: Generate requirements.txt
+        run: make generate-requirements
       
       - name: Login to Amazon ECR
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -202,7 +214,7 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG . -f ./docker/Dockerfile
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG . -f ./docker/flask.Dockerfile
           docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
           docker push $ECR_REGISTRY/$ECR_REPOSITORY
           echo "name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT

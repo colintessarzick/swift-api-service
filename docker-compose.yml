@@ -2,10 +2,11 @@ services:
   app:
     build:
       context: .
-      dockerfile: ./docker/local.Dockerfile
+      dockerfile: ./docker/flask.Dockerfile
     env_file:
       - .env.compose
     container_name: swift-api-service
     ports:
-      - 8080:8080
-    command: ["serve", "--env", "local", "--hostname", "0.0.0.0", "--port", "8080"]
+      - 5813:5813
+    # command: ["serve", "--env", "local", "--hostname", "0.0.0.0", "--port", "8080"]
+    command: ["python3", "-m", "flask", "--app", "src/application", "run", "--host=0.0.0.0", "--port=5813"]

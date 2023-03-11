@@ -4,7 +4,7 @@ compose-up:
 compose-down:
 	docker compose down --remove-orphans
 
-compose-new:
+compose-new: generate-requirements
 	docker compose up -d --build --remove-orphans
 
 prune: compose-down
@@ -19,3 +19,10 @@ run:
 
 unittest:
 	swift test
+
+# ------------------------------
+# Python
+# ------------------------------
+
+generate-requirements:
+	poetry export --without-hashes --format=requirements.txt > requirements.txt
