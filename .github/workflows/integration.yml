@@ -204,12 +204,12 @@ jobs:
         run: make generate-requirements
       
       - name: Login to Amazon ECR
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
       
       - name: Build, tag, and push image to Amazon ECR
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
         id: build-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -221,6 +221,6 @@ jobs:
           echo "name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
       
       - name: Deploy to App Runner
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
         id: deploy
         run: aws apprunner start-deployment --service-arn ${{ env.APP_RUNNER_ARN }} --region eu-west-1
