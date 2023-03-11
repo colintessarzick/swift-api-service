@@ -32,7 +32,7 @@ resource "aws_apprunner_auto_scaling_configuration_version" "api_service" {
 }
 
 resource "aws_apprunner_custom_domain_association" "api_service" {
-  provider   = aws.ireland
+  provider = aws.ireland
 
   domain_name = local.public_service_domain
   service_arn = aws_apprunner_service.api_service.arn

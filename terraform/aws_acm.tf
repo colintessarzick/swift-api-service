@@ -6,7 +6,7 @@ resource "aws_acm_certificate" "public_domain" {
 }
 
 resource "aws_acm_certificate_validation" "public_domain" {
-  provider   = aws.ireland
+  provider = aws.ireland
 
   certificate_arn         = aws_acm_certificate.public_domain.arn
   validation_record_fqdns = [for record in aws_route53_record.public_domain : record.fqdn]
