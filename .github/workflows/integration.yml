@@ -135,7 +135,6 @@ jobs:
         run: make auto-apply
 
   build:
-    needs: deploy-infrastructure
     name: Build Application
     runs-on: ubuntu-latest
 
