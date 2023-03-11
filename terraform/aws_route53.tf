@@ -21,8 +21,6 @@ resource "aws_route53_record" "public_domain" {
 }
 
 resource "aws_route53_record" "api_service_domain_mapping" {
-  depends_on = [aws_apprunner_custom_domain_association.api_service]
-
   for_each = {
     for dvo in aws_apprunner_custom_domain_association.api_service.certificate_validation_records : dvo.name => {
       name   = dvo.name

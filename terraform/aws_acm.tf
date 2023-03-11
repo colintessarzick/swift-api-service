@@ -6,7 +6,6 @@ resource "aws_acm_certificate" "public_domain" {
 }
 
 resource "aws_acm_certificate_validation" "public_domain" {
-  depends_on = [aws_route53_record.public_domain]
   provider   = aws.ireland
 
   certificate_arn         = aws_acm_certificate.public_domain.arn
