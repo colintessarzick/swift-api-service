@@ -20,3 +20,6 @@ fmt-check:
 
 auto-apply:
 	terraform apply -var-file=$(BACKEND_CONFIG) -auto-approve -no-color
+
+destroy:
+	terraform destroy -var-file=$(BACKEND_CONFIG) -no-color

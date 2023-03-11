@@ -2,7 +2,7 @@ services:
   app:
     build:
       context: .
-      dockerfile: ./docker/flask.Dockerfile
+      dockerfile: ./docker/local.Dockerfile
     env_file:
       - .env.compose
     container_name: swift-api-service
