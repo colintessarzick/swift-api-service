@@ -29,6 +29,12 @@ variable "common_tags" {
   default     = {}
 }
 
+variable "root_domain" {
+  type        = string
+  description = "The root domain name for the application"
+  default     = "chrood.com"
+}
+
 
 # -----------------------------------------------------------------------------
 # CONSTANTS
@@ -46,4 +52,5 @@ locals {
     ireland   = "eu-west-1"
     virginia  = "us-east-1"
   })
+  public_service_domain = "${var.environment}.demo.${var.root_domain}"
 }
