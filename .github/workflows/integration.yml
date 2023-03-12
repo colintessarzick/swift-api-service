@@ -138,6 +138,7 @@ jobs:
 
   build:
     name: Build Application
+    needs: deploy-infrastructure
     runs-on: ubuntu-latest
 
     env:
