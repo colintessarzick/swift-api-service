@@ -32,7 +32,7 @@ variable "common_tags" {
 variable "initial_deployment" {
   type        = bool
   description = "Whether this is the first deployment of the service"
-  default     = true
+  default     = false
 }
 
 variable "deploy_custom_domain" {
