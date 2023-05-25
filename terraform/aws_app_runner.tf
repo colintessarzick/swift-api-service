@@ -22,7 +22,7 @@ resource "aws_apprunner_service" "api_service" {
     }
   }
 
-  auto_scaling_configuration_arn = aws_apprunner_auto_scaling_configuration_version.api_service.arn
+  auto_scaling_configuration_arn = aws_apprunner_auto_scaling_configuration_version.api_service[0].arn
 }
 
 resource "aws_apprunner_auto_scaling_configuration_version" "api_service" {
