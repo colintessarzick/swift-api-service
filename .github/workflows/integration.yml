@@ -218,7 +218,7 @@ jobs:
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:latest . -f ./docker/Dockerfile
           docker push $ECR_REGISTRY/$ECR_REPOSITORY
-          echo "name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+          echo "name=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
           MANIFEST=$(aws ecr batch-get-image --repository-name $ECR_REPOSITORY --image-ids imageTag=latest --output json | jq --raw-output --join-output '.images[0].imageManifest')
           aws ecr put-image --repository-name $ECR_REPOSITORY --image-tag $IMAGE_TAG --image-manifest "$MANIFEST" --region eu-west-1
       
