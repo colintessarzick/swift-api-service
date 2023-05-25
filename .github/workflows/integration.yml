@@ -224,5 +224,5 @@ jobs:
         if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
         id: deploy
         run: |
-          aws apprunner update-service --service-arn ${{ env.APP_RUNNER_ARN }} --source-configuration ImageRepository={ImageIdentifier=${{ steps.build-image.outputs.name }}, ImageRepositoryType=ECR}
+          aws apprunner update-service --service-arn ${{ env.APP_RUNNER_ARN }} --source-configuration {\"ImageRepository\":{\"ImageIdentifier\":\"${{ steps.build-image.outputs.IMAGE_TAG }}\",\"ImageRepositoryType\":\"ECR\"}} --region eu-west-1
           aws apprunner start-deployment --service-arn ${{ env.APP_RUNNER_ARN }} --region eu-west-1
