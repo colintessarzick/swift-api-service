@@ -29,6 +29,18 @@ variable "common_tags" {
   default     = {}
 }
 
+variable "initial_deployment" {
+  type        = bool
+  description = "Whether this is the first deployment of the service"
+  default     = false
+}
+
+variable "deploy_custom_domain" {
+  type        = bool
+  description = "Whether to deploy a custom domain for the service"
+  default     = false
+}
+
 variable "root_domain" {
   type        = string
   description = "The root domain name for the application"

@@ -1,4 +1,5 @@
 resource "aws_apprunner_service" "api_service" {
+  count    = var.initial_deployment ? 0 : 1
   provider = aws.ireland
 
   service_name = local.resource_prefix
@@ -25,6 +26,7 @@ resource "aws_apprunner_service" "api_service" {
 }
 
 resource "aws_apprunner_auto_scaling_configuration_version" "api_service" {
+  count    = var.initial_deployment ? 0 : 1
   provider = aws.ireland
 
   auto_scaling_configuration_name = local.resource_prefix
@@ -34,9 +36,10 @@ resource "aws_apprunner_auto_scaling_configuration_version" "api_service" {
   min_size        = 1
 }
 
-# resource "aws_apprunner_custom_domain_association" "api_service" {
-#   provider = aws.ireland
+resource "aws_apprunner_custom_domain_association" "api_service" {
+  count    = var.deploy_custom_domain ? 1 : 0
+  provider = aws.ireland
 
-#   domain_name = local.public_service_domain
-#   service_arn = aws_apprunner_service.api_service.arn
-# }
+  domain_name = local.public_service_domain
+  service_arn = aws_apprunner_service.api_service.arn
+}
