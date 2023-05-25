@@ -4,7 +4,7 @@ data "aws_route53_zone" "domain" {
 }
 
 resource "aws_route53_record" "public_domain" {
-  for_each = var.deploy_custom_domain ? {
+  for_each = var.validate_custom_domain ? {
     for dvo in aws_acm_certificate.public_domain[0].domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name
       type   = dvo.resource_record_type
@@ -21,7 +21,7 @@ resource "aws_route53_record" "public_domain" {
 }
 
 resource "aws_route53_record" "api_service_domain_mapping" {
-  for_each = var.deploy_custom_domain ? {
+  for_each = var.validate_custom_domain ? {
     for dvo in aws_apprunner_custom_domain_association.api_service[0].certificate_validation_records : dvo.name => {
       name   = dvo.name
       type   = dvo.type
