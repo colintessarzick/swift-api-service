@@ -44,7 +44,7 @@ variable "deploy_custom_domain" {
 variable "validate_custom_domain" {
   type        = bool
   description = "Whether to validate the custom domain for the service"
-  default     = false
+  default     = true
 }
 
 variable "root_domain" {
