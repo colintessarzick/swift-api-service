@@ -220,11 +220,11 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY
           echo "name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
           MANIFEST=$(aws ecr batch-get-image --repository-name $ECR_REPOSITORY --image-ids imageTag=latest --output json | jq --raw-output --join-output '.images[0].imageManifest')
-          aws ecr put-image --repository-name $ECR_REPOSITORY --image-tag $IMAGE_TAG --image-manifest "$MANIFEST"
+          aws ecr put-image --repository-name $ECR_REPOSITORY --image-tag $IMAGE_TAG --image-manifest "$MANIFEST" --region eu-west-1
       
       - name: Deploy to App Runner
         if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
         id: deploy
         run: |
-          aws apprunner update-service --service-arn ${{ env.APP_RUNNER_ARN }} --source-configuration {"ImageRepository":{"ImageIdentifier":"${{ steps.build-image.outputs.IMAGE_TAG }}","ImageRepositoryType":"ECR"}} --region eu-west-1
+          aws apprunner update-service --service-arn ${{ env.APP_RUNNER_ARN }} --source-configuration ImageRepository=ImageRepositoryType=ECR,ImageIdentifier=${{ steps.build-image.outputs.name }} --region eu-west-1
           aws apprunner start-deployment --service-arn ${{ env.APP_RUNNER_ARN }} --region eu-west-1
