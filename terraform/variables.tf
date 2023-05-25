@@ -38,7 +38,7 @@ variable "initial_deployment" {
 variable "deploy_custom_domain" {
   type        = bool
   description = "Whether to deploy a custom domain for the service"
-  default     = false
+  default     = true
 }
 
 variable "root_domain" {
