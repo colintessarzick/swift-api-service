@@ -41,5 +41,5 @@ resource "aws_apprunner_custom_domain_association" "api_service" {
   provider = aws.ireland
 
   domain_name = local.public_service_domain
-  service_arn = aws_apprunner_service.api_service.arn
+  service_arn = aws_apprunner_service.api_service[0].arn
 }
