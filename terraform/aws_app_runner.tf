@@ -31,7 +31,7 @@ resource "aws_apprunner_auto_scaling_configuration_version" "api_service" {
 
   auto_scaling_configuration_name = local.resource_prefix
 
-  max_concurrency = 10
+  max_concurrency = 30
   max_size        = 10
   min_size        = 1
 }
