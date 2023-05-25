@@ -7,7 +7,7 @@ resource "aws_acm_certificate" "public_domain" {
 }
 
 resource "aws_acm_certificate_validation" "public_domain" {
-  count    = var.deploy_custom_domain ? 1 : 0
+  count    = var.validate_custom_domain ? 1 : 0
   provider = aws.ireland
 
   certificate_arn         = aws_acm_certificate.public_domain[0].arn
