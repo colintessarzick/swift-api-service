@@ -223,7 +223,7 @@ jobs:
           aws ecr put-image --repository-name $ECR_REPOSITORY --image-tag $IMAGE_TAG --image-manifest "$MANIFEST" --region eu-west-1
       
       - name: Deploy to App Runner
-        if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
-        id: deploy
+        # if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+        # id: deploy
+        # run: aws apprunner start-deployment --service-arn ${{ env.APP_RUNNER_ARN }} --region eu-west-1
         # run: aws apprunner update-service --service-arn ${{ env.APP_RUNNER_ARN }} --source-configuration '{"ImageRepository":{"ImageIdentifier":"${{ steps.build-image.outputs.name }}","ImageRepositoryType":"ECR"}}' --region eu-west-1
-        run: aws apprunner start-deployment --service-arn ${{ env.APP_RUNNER_ARN }} --region eu-west-1
