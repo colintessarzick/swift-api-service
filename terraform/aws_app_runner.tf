@@ -2,8 +2,6 @@ resource "aws_apprunner_service" "api_service" {
   count    = var.initial_deployment ? 0 : 1
   provider = aws.ireland
 
-  depends_on = [aws_apprunner_observability_configuration.api_service[0], aws_apprunner_auto_scaling_configuration_version.api_service[0]]
-
   service_name = local.resource_prefix
 
   source_configuration {
@@ -24,23 +22,7 @@ resource "aws_apprunner_service" "api_service" {
     }
   }
 
-  observability_configuration {
-    observability_configuration_arn = aws_apprunner_observability_configuration.api_service[0].arn
-    observability_enabled           = true
-  }
-
   auto_scaling_configuration_arn = aws_apprunner_auto_scaling_configuration_version.api_service[0].arn
-}
-
-resource "aws_apprunner_observability_configuration" "api_service" {
-  count    = var.initial_deployment ? 0 : 1
-  provider = aws.ireland
-
-  observability_configuration_name = local.resource_prefix
-
-  trace_configuration {
-    vendor = "AWSXRAY"
-  }
 }
 
 resource "aws_apprunner_auto_scaling_configuration_version" "api_service" {
