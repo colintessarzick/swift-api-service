@@ -10,7 +10,7 @@ resource "aws_apprunner_service" "api_service" {
       }
       image_identifier      = "${aws_ecr_repository.api_service.repository_url}:latest"
       image_repository_type = "ECR"
-      
+
       runtime_environment_variables = {
         "ENVIRONMENT" = var.environment
       }
