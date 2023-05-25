@@ -23,14 +23,14 @@ resource "aws_apprunner_service" "api_service" {
   }
 
   observability_configuration {
-    observability_configuration_arn = aws_apprunner_observation_configuration.api_service[0].arn
+    observability_configuration_arn = aws_apprunner_observability_configuration.api_service[0].arn
     observability_enabled           = true
   }
 
   auto_scaling_configuration_arn = aws_apprunner_auto_scaling_configuration_version.api_service[0].arn
 }
 
-resource "aws_apprunner_observation_configuration" "api_service" {
+resource "aws_apprunner_observability_configuration" "api_service" {
   count    = var.initial_deployment ? 0 : 1
   provider = aws.ireland
 
