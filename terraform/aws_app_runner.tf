@@ -10,19 +10,15 @@ resource "aws_apprunner_service" "api_service" {
       }
       image_identifier      = "${aws_ecr_repository.api_service.repository_url}:latest"
       image_repository_type = "ECR"
+      
+      runtime_environment_variables = {
+        "ENVIRONMENT" = var.environment
+      }
     }
     auto_deployments_enabled = false
 
     authentication_configuration {
       access_role_arn = aws_iam_role.api_service_app_runner.arn
-    }
-
-    code_repository {
-      code_configuration {
-        runtime_environment_variables = {
-          "ENVIRONMENT" = var.environment
-        }
-      }
     }
   }
 
