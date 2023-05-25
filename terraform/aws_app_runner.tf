@@ -16,6 +16,14 @@ resource "aws_apprunner_service" "api_service" {
     authentication_configuration {
       access_role_arn = aws_iam_role.api_service_app_runner.arn
     }
+
+    code_repository {
+      code_configuration {
+        runtime_environment_variables = {
+          "ENVIRONMENT" = var.environment
+        }
+      }
+    }
   }
 
   auto_scaling_configuration_arn = aws_apprunner_auto_scaling_configuration_version.api_service.arn

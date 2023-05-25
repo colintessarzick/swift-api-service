@@ -1,5 +1,9 @@
+import os
+
 from flask import Flask
 
+
+environment = os.environ['ENVIRONMENT']
 
 app = Flask(__name__)
 
@@ -7,9 +11,9 @@ app = Flask(__name__)
 def hello_world():
     return 'Hello, World!'
 
-@app.route('/awss')
+@app.route('/cosee')
 def aws():
-    return 'AWS User Group!'
+    return f'Jetzt gehts los auf {environment}!'
 
 if __name__ == "__main__":
     app.run(debug=True)
