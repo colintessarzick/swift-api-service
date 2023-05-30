@@ -36,3 +36,14 @@ resource "aws_route53_record" "api_service_domain_mapping" {
   ttl             = 60
   zone_id         = data.aws_route53_zone.domain.zone_id
 }
+
+resource "aws_route53_record" "app_runner_dns_target" {
+  count = var.validate_custom_domain ? 1 : 0
+
+  allow_overwrite = true
+  name            = local.public_service_domain
+  records         = [aws_apprunner_service.api_service[0].default_domain]
+  type            = "CNAME"
+  ttl             = 60
+  zone_id         = data.aws_route53_zone.domain.zone_id
+}
