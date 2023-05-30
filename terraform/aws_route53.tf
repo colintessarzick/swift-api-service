@@ -42,7 +42,7 @@ resource "aws_route53_record" "app_runner_dns_target" {
 
   allow_overwrite = true
   name            = local.public_service_domain
-  records         = [aws_apprunner_service.api_service[0].default_domain]
+  records         = [aws_apprunner_service.api_service[0].service_url]
   type            = "CNAME"
   ttl             = 60
   zone_id         = data.aws_route53_zone.domain.zone_id
